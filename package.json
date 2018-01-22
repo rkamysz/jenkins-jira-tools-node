@@ -1,0 +1,33 @@
+{
+  "name": "jenkins-jira-tools",
+  "version": "1.0.0",
+  "description": "Some tools to automate processes between jenkins and jira.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rkamysz/jenkins-jira-tools-node.git"
+  },
+  "keywords": [
+    "jira",
+    "jenkins",
+    "tools",
+    "fixVersions",
+    "node",
+    "java",
+    "curl",
+    "xml"
+  ],
+  "author": "Radoslaw Kamysz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rkamysz/jenkins-jira-tools-node/issues"
+  },
+  "homepage": "https://github.com/rkamysz/jenkins-jira-tools-node#readme",
+  "dependencies": {
+    "curl": "^0.1.4",
+    "xml-parse": "^0.3.1"
+  }
+}
