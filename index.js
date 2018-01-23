@@ -32,13 +32,13 @@ function extractTicketFromCommit(commits, pattern) {
     return tickets;
 }
 
-function getTicketsIds(url) {
+function getTicketsIds(url, pattern) {
     fetch(url)
     .then(response => {
       response.text().then(data => {
         var parsedXML = xml.parse(data);
         var changeSet = getChangeSetNode(parsedXML[0].childNodes);
-        var tickets = extractTicketFromCommit(changeSet.childNodes);
+        var tickets = extractTicketFromCommit(changeSet.childNodes, pattern);
 
         return tickets;
       });
@@ -59,12 +59,12 @@ function getVersionFromPackageJson() {
     }
 }
 
-function updateTicketFixVersion(ticket, versionId, user, password) {
-    fetch(url+'/issue/'+ticket, { 
+function updateTicketFixVersion(ticket, versionId, jira) {
+    fetch(jira.url+'/issue/'+ticket, { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic '+user+':'+password
+            'Authorization': 'Basic '+jira.user+':' +jira.password
         },
         body:'{"update":{"fixVersions":[{"add":{"id":"'+versionId+'"}}]}}'
     }).then(response => {
@@ -76,15 +76,15 @@ function updateTicketFixVersion(ticket, versionId, user, password) {
 
 function updateFixVersions(config) {
     console.log("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions");
-    var tickets = getTicketsIds(config.jenkinsBuildXMLDataUrl);
+    var tickets = getTicketsIds(config.jenkinsBuildXMLDataUrl, config.ticketPattern);
     var versionName = getVersionFromPackageJson();
     
     //addVersionToJira
-    fetch(url+'/version', { 
+    fetch(config.jira.url+'/version', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic '+user+':'+password
+            'Authorization': 'Basic '+config.jira.user+':'+config.jira.password
         },
         body:JSON.stringify({ 
             name:versionName, 
@@ -97,10 +97,10 @@ function updateFixVersions(config) {
     }).then(response => {
         return response.json();
     }).then(json => {
-        var obj = JSON.parse(json);
-        if(obj.id) {
+        var version = JSON.parse(json);
+        if(version.id) {
             tickets.forEach(ticket => {
-                updateTicketFixVersion(ticket, obj.id);
+                updateTicketFixVersion(ticket, version.id, config.jira);
             });
             onsole.log("(　＾∇＾)  Done.");
         } else {
