@@ -107,7 +107,7 @@ function updateFixVersions(config) {
             tickets.forEach(ticket => {
                 updateTicketFixVersion(ticket, versionData.id, config.jira.url, auth64);
             });
-            onsole.log("(　＾∇＾)  Done.");
+            console.log("(　＾∇＾)  Done.");
         } else {
             console.log("(⊙＿⊙')  Something went wrong. I didn't get version id.");
         }
