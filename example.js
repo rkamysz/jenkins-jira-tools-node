@@ -1,3 +1,4 @@
+//updateJira.js
 const jjt = require("jenkins-jira-tools");
 
 jjt.updateFixVersions({
@@ -19,3 +20,12 @@ jjt.updateFixVersions({
         description:""
     }
 });
+
+/*
+
+In Jenkinsfile:
+...
+sh "node updateJira.js"
+...
+
+*/
