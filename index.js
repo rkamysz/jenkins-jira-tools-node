@@ -110,4 +110,5 @@ function updateFixVersions(config) {
         console.log("(⊙＿⊙')  Something went wrong. ", error);
     });
 }
-module.exports = updateFixVersions;
+
+module.exports.updateFixVersions = updateFixVersions;
