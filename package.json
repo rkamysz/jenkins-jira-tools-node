@@ -1,6 +1,6 @@
 {
   "name": "jenkins-jira-tools",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Some tools to automate processes between jenkins and jira.",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/rkamysz/jenkins-jira-tools-node#readme",
   "dependencies": {
-    "form-data": "^2.3.1",
     "node-fetch": "^1.7.3",
     "xml-parse": "^0.3.1"
   }
