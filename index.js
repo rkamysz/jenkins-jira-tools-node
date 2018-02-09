@@ -102,11 +102,10 @@ function updateFixVersions(config) {
         })
     }).then(response => {
         return response.json();
-    }).then(json => {
-        var version = JSON.parse(json);
-        if(version.id) {
+    }).then(versionData => {
+        if(versionData.id) {
             tickets.forEach(ticket => {
-                updateTicketFixVersion(ticket, version.id, config.jira.url, auth64);
+                updateTicketFixVersion(ticket, versionData.id, config.jira.url, auth64);
             });
             onsole.log("(　＾∇＾)  Done.");
         } else {
