@@ -55,7 +55,7 @@ function getVersionFromPackageJson() {
     if(content) {
         var pckJson = JSON.parse(content);
         var reg = new RegExp('[^/]*$','g'); 
-        var name = pckJson.match(reg);
+        var name = pckJson.name.match(reg);
         return name[0] + "@" + pckJson.version;
     }
 }
