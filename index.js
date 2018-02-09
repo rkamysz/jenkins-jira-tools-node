@@ -60,7 +60,7 @@ function getVersionFromPackageJson() {
 
 function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
     fetch(jiraUrl + '/issue/' + ticket, { 
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type':'application/json',
             'Authorization':'Basic ' + auth64
