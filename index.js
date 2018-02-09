@@ -60,12 +60,12 @@ function getVersionFromPackageJson() {
     }
 }
 
-function updateTicketFixVersion(ticket, versionId, jira) {
-    fetch(jira.url + '/issue/' + ticket, { 
+function updateTicketFixVersion(ticket, versionId, jiraUrl, auth) {
+    fetch(jiraUrl + '/issue/' + ticket, { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + jira.user + ':' + jira.password
+            'Authorization': 'Basic ' + auth
         },
         body:'{"update":{"fixVersions":[{"add":{"id":"' + versionId + '"}}]}}'
     }).then(response => {
@@ -79,13 +79,14 @@ function updateFixVersions(config) {
     console.log("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions");
     var tickets = getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern);
     var versionName = getVersionFromPackageJson();
+    var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
     
     //addVersionToJira
     fetch(config.jira.url+'/version', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic '+config.jira.user+':'+config.jira.password
+            'Authorization': 'Basic '+ auth64
         },
         body:JSON.stringify({ 
             name:versionName,
@@ -101,7 +102,7 @@ function updateFixVersions(config) {
         var version = JSON.parse(json);
         if(version.id) {
             tickets.forEach(ticket => {
-                updateTicketFixVersion(ticket, version.id, config.jira);
+                updateTicketFixVersion(ticket, version.id, config.jira.url, auth64);
             });
             onsole.log("(　＾∇＾)  Done.");
         } else {
