@@ -1,7 +1,6 @@
 const xml = require("xml-parse");
 const fetch = require("node-fetch");
 const fs = require('fs');
-const FormData = require("form-data")
 
 function getChangeSetNode(nodes) {
     var node;
@@ -61,14 +60,13 @@ function getVersionFromPackageJson() {
     }
 }
 
-function updateTicketFixVersion(ticket, versionId, jiraUrl, auth) {
-    var form = new FormData();
-    form.append('Authorization', 'Basic '+ auth);
-    form.append('Content-Type', 'application/json');
-    
+function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
     fetch(jiraUrl + '/issue/' + ticket, { 
         method: 'POST',
-        headers: form.getHeaders(),
+        headers: {
+            'Content-Type':'application/json',
+            'Authorization':'Basic ' + auth64
+        },
         body:'{"update":{"fixVersions":[{"add":{"id":"' + versionId + '"}}]}}'
     }).then(response => {
         console.log("(•‿•)  Ticket " + ticket + " has been updated.");
@@ -77,25 +75,30 @@ function updateTicketFixVersion(ticket, versionId, jiraUrl, auth) {
     });
 }
 
+function getFormatedDate() {
+    var date = new Date().toString().split(" ");
+    return [date[2],date[1],date[3]].join("/");
+  }
+
 function updateFixVersions(config) {
     console.log("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions");
     var tickets = getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern);
     var versionName = getVersionFromPackageJson();
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
-    var form = new FormData();
-    form.append('Authorization', 'Basic '+ auth64);
-    form.append('Content-Type', 'application/json');
     
     fetch(config.jira.url+'/version', { 
         method: 'POST',
-        headers: form.getHeaders(),
+        headers: {
+            'Content-Type':'application/json',
+            'Authorization':'Basic ' + auth64
+        },
         body:JSON.stringify({ 
             name:versionName,
             project:config.jira.project,
             description:config.versionData.description,
             archived:(config.versionData.archived || false),
             released:(config.versionData.released || true),
-            userReleaseDate:(new Date().toISOString().substring(0,10))
+            userReleaseDate:getFormatedDate()
         })
     }).then(response => {
         return response.json();
