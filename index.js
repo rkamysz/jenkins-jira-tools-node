@@ -60,15 +60,15 @@ function getVersionFromPackageJson() {
 }
 
 function updateTicketFixVersion(ticket, versionId, jira) {
-    fetch(jira.url+'/issue/'+ticket, { 
+    fetch(jira.url + '/issue/' + ticket, { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic '+jira.user+':' +jira.password
+            'Authorization': 'Basic ' + jira.user + ':' + jira.password
         },
-        body:'{"update":{"fixVersions":[{"add":{"id":"'+versionId+'"}}]}}'
+        body:'{"update":{"fixVersions":[{"add":{"id":"' + versionId + '"}}]}}'
     }).then(response => {
-        console.log("(•‿•)  Ticket "+ticket+" has been updated.");
+        console.log("(•‿•)  Ticket " + ticket + " has been updated.");
     }).catch(error => {
         console.log(error);
     });
@@ -76,7 +76,7 @@ function updateTicketFixVersion(ticket, versionId, jira) {
 
 function updateFixVersions(config) {
     console.log("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions");
-    var tickets = getTicketsIds(config.jenkinsBuildXMLDataUrl, config.ticketPattern);
+    var tickets = getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern);
     var versionName = getVersionFromPackageJson();
     
     //addVersionToJira
@@ -87,11 +87,11 @@ function updateFixVersions(config) {
             'Authorization': 'Basic '+config.jira.user+':'+config.jira.password
         },
         body:JSON.stringify({ 
-            name:versionName, 
-            description:config.versionDescription,
-            project:config.project,
-            archived:(config.versionArchived || false),
-            released:(config.versionReleased || true),
+            name:versionName,
+            project:config.jira.project,
+            description:config.versionData.description,
+            archived:(config.versionData.archived || false),
+            released:(config.versionData.released || true),
             userReleaseDate:(new Date().toISOString().substring(0,10))
         })
     }).then(response => {
