@@ -1,6 +1,6 @@
-const updateFixVersions = require("jenkins-jira-tools-node");
+const jjt = require("jenkins-jira-tools-node");
 
-updateFixVersions({
+jjt.updateFixVersions({
     jira:{
         url:"",
         user:"",
