@@ -1,6 +1,7 @@
 const xml = require("xml-parse");
 const fetch = require("node-fetch");
 const fs = require('fs');
+const FormData = require("form-data")
 
 function getChangeSetNode(nodes) {
     var node;
@@ -61,12 +62,13 @@ function getVersionFromPackageJson() {
 }
 
 function updateTicketFixVersion(ticket, versionId, jiraUrl, auth) {
+    var form = new FormData();
+    form.append('Authorization', 'Basic '+ auth);
+    form.append('Content-Type', 'application/json');
+    
     fetch(jiraUrl + '/issue/' + ticket, { 
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + auth
-        },
+        headers: form.getHeaders(),
         body:'{"update":{"fixVersions":[{"add":{"id":"' + versionId + '"}}]}}'
     }).then(response => {
         console.log("(•‿•)  Ticket " + ticket + " has been updated.");
@@ -80,14 +82,13 @@ function updateFixVersions(config) {
     var tickets = getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern);
     var versionName = getVersionFromPackageJson();
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
+    var form = new FormData();
+    form.append('Authorization', 'Basic '+ auth64);
+    form.append('Content-Type', 'application/json');
     
-    //addVersionToJira
     fetch(config.jira.url+'/version', { 
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic '+ auth64
-        },
+        headers: form.getHeaders(),
         body:JSON.stringify({ 
             name:versionName,
             project:config.jira.project,
