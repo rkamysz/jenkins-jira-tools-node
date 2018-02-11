@@ -10,7 +10,7 @@ function getChangeSetNode(nodes) {
             return node;
         }
     }
-    return [];
+    return null;
 }
 
 function extractTicketFromCommit(commits, pattern) {
@@ -40,7 +40,10 @@ function getTicketsIds(url, pattern) {
     }).then(data => {
         var parsedXML = xml.parse(data);
         var changeSet = getChangeSetNode(parsedXML[0].childNodes);
-        return extractTicketFromCommit(changeSet.childNodes, pattern);
+        if(changeSet) {
+            return extractTicketFromCommit(changeSet.childNodes, pattern);
+        }
+        return [];
     })
     .catch(error => {
         console.error(error);
@@ -88,16 +91,20 @@ function createNewVersionInJira(jiraUrl, auth64, data) {
 
 function updateJiraTickets(tickets, versionData) {
     return new Promise((resolve, reject) =>{
-        if(versionData.id) {
-            var promise = Promise.resolve();
-            tickets.forEach(ticket => {
-                promise = promise.then(updateTicketFixVersion(ticket, 
-                    versionData.id, config.jira.url, auth64));
-            });
-            resolve();
+        if(tickets.length = 0) {
+            console.log("(•‿•)  No tickets to update.");
         } else {
-            reject(new Error("(⊙＿⊙')  Something went wrong. I didn't get version id."));
+            if(versionData.id) {
+                var promise = Promise.resolve();
+                tickets.forEach(ticket => {
+                    promise = promise.then(updateTicketFixVersion(ticket, 
+                        versionData.id, config.jira.url, auth64));
+                });
+            } else {
+                reject(new Error("(⊙＿⊙')  Something went wrong. I didn't get version id."));
+            }
         }
+        resolve();
     });
 }
 
