@@ -36,15 +36,15 @@ function extractTicketFromCommit(commits, pattern) {
 function getTicketsIds(url, pattern) {
     return fetch(url)
     .then(response => {
-      return response.text();
+        return response.text();
     }).then(data => {
-        
         var parsedXML = xml.parse(data);
         var changeSet = getChangeSetNode(parsedXML[0].childNodes);
         return extractTicketFromCommit(changeSet.childNodes, pattern);
     })
     .catch(error => {
-      return [];
+        console.error(error);
+        return [];
     });
 }
 
@@ -59,7 +59,7 @@ function getVersionFromPackageJson() {
 }
 
 function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
-    fetch(jiraUrl + '/issue/' + ticket, { 
+    return fetch(jiraUrl + '/issue/' + ticket, { 
         method: 'PUT',
         headers: {
             'Content-Type':'application/json',
@@ -69,51 +69,67 @@ function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
     }).then(response => {
         console.log("(•‿•)  Ticket " + ticket + " has been updated.");
     }).catch(error => {
-        console.log(error);
+        console.log("(ಥ_ಥ)  Ticket " + ticket + " has not been updated. Error:", error);
+    });
+}
+
+function createNewVersionInJira(jiraUrl, auth64, data) {
+    return fetch(jiraUrl + '/version', { 
+        method: 'POST',
+        headers: {
+            'Content-Type':'application/json',
+            'Authorization':'Basic ' + auth64
+        },
+        body:JSON.stringify(data)
+    }).then(response => {
+        return response.json();
+    });
+}
+
+function updateJiraTickets(tickets, versionData) {
+    return new Promise((resolve, reject) =>{
+        if(versionData.id) {
+            var promise = Promise.resolve();
+            tickets.forEach(ticket => {
+                promise = promise.then(updateTicketFixVersion(ticket, 
+                    versionData.id, config.jira.url, auth64));
+            });
+            resolve();
+        } else {
+            reject(new Error("(⊙＿⊙')  Something went wrong. I didn't get version id."));
+        }
     });
 }
 
 function getFormatedDate() {
     var date = new Date().toString().split(" ");
     return [date[2],date[1],date[3]].join("/");
-  }
+}
 
 function updateFixVersions(config) {
-    console.log("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions");
+    console.log(`
+        (∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions in Jira tickets
+    `);
     var tickets = [];
-    var versionName = getVersionFromPackageJson();
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
-    getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern).then(result => {
-        tickets = result;
-    }).then(() =>{
-        fetch(config.jira.url+'/version', { 
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json',
-                'Authorization':'Basic ' + auth64
-            },
-            body:JSON.stringify({ 
-                name:versionName,
-                project:config.jira.project,
-                description:config.versionData.description,
-                archived:(config.versionData.archived || false),
-                released:(config.versionData.released || true),
-                userReleaseDate:getFormatedDate()
-            })
-        }).then(response => {
-            return response.json();
-        }).then(versionData => {
-            if(versionData.id) {
-                tickets.forEach(ticket => {
-                    updateTicketFixVersion(ticket, versionData.id, config.jira.url, auth64);
-                });
-                console.log("(　＾∇＾)  Done.");
-            } else {
-                console.log("(⊙＿⊙')  Something went wrong. I didn't get version id.");
-            }
-        }).catch(error => {
-            console.log("(⊙＿⊙')  Something went wrong. ", error);
-        });
+    var versionData = { 
+        name:getVersionFromPackageJson(),
+        project:config.jira.project,
+        description:config.versionData.description,
+        archived:(config.versionData.archived || false),
+        released:(config.versionData.released || true),
+        userReleaseDate:getFormatedDate()
+    }
+
+    getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
+    .then(result => { tickets = result; })
+    .then(createNewVersionInJira(config.jira.url, auth64, data))
+    .then(versionData => updateJiraTickets(tickets, versionData))
+    .then(() => {
+        console.log("(　＾∇＾)  Done.");
+    })
+    .catch(error => {
+        console.log("(⊙＿⊙')  Something went wrong. ", error);
     });
 }
 
