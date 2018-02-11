@@ -85,11 +85,15 @@ function createNewVersionInJira(jiraUrl, auth64, data) {
         },
         body:JSON.stringify(data)
     }).then(response => {
+        console.log("(•‿•)  New version has been created " + data.name);
         return response.json();
+    }).catch(error => {
+        console.log("(ಥ_ಥ)  Version " + data.name + " has not been added. Error:", error);
     });
 }
 
 function updateJiraTickets(tickets, versionData) {
+    console.log("versionData:", versionData);
     return new Promise((resolve, reject) =>{
         if(tickets.length = 0) {
             console.log("(•‿•)  No tickets to update.");
