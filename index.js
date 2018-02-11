@@ -112,7 +112,7 @@ function updateFixVersions(config) {
     `);
     var tickets = [];
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
-    var versionData = { 
+    var versionConfig = { 
         name:getVersionFromPackageJson(),
         project:config.jira.project,
         description:config.versionData.description,
@@ -123,8 +123,8 @@ function updateFixVersions(config) {
 
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
     .then(result => { tickets = result; })
-    .then(createNewVersionInJira(config.jira.url, auth64, data))
-    .then(versionData => updateJiraTickets(tickets, versionData))
+    .then(createNewVersionInJira(config.jira.url, auth64, versionConfig))
+    .then(versionInfo => updateJiraTickets(tickets, versionInfo))
     .then(() => {
         console.log("(　＾∇＾)  Done.");
     })
