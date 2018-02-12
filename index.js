@@ -95,10 +95,10 @@ function createNewVersionInJira(jiraUrl, auth64, data) {
 
 function updateJiraTickets(tickets, versionData) {
     return new Promise((resolve, reject) =>{
-        if(tickets.length = 0) {
+        if(tickets.length == 0) {
             console.log("(•‿•)  No tickets to update.");
         } else {
-            console.log("We have "+ tickets.length + " to update");
+            console.log("We have "+ tickets.length + " tickets to update");
             if(versionData.id) {
                 console.log("We have version with id:", versionData.id);
                 var promise = Promise.resolve();
