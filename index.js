@@ -99,9 +99,9 @@ function createNewVersionInJira(jiraUrl, auth64, data) {
     });
 }
 
-function updateJiraTickets(tickets, versionData, jiraUrl, auth64) {
+function updateJiraTickets(tickets, versionId, jiraUrl, auth64) {
     return Promise.all(tickets.map((ticket) => {
-        return updateTicketFixVersion(ticket, versionData.id, jiraUrl, auth64);
+        return updateTicketFixVersion(ticket, versionId, jiraUrl, auth64);
     }));
 }
 
