@@ -93,18 +93,20 @@ function createNewVersionInJira(jiraUrl, auth64, data) {
     });
 }
 
-function updateJiraTickets(tickets, versionData) {
+function updateJiraTickets(tickets, versionData, jiraUrl, auth64) {
     return new Promise((resolve, reject) =>{
         if(tickets.length == 0) {
             console.log("(•‿•)  No tickets to update.");
         } else {
-            console.log("We have "+ tickets.length + " tickets to update");
+            console.log("We have "+ tickets.length + " ticket(s) to update");
             if(versionData.id) {
-                console.log("We have version with id:", versionData.id);
                 var promise = Promise.resolve();
                 tickets.forEach(ticket => {
                     promise = promise.then(() => { return updateTicketFixVersion(ticket, 
-                        versionData.id, config.jira.url, auth64); });
+                        versionData.id, jiraUrl, auth64); })
+                    .catch(err => { 
+                        console.error("(ಥ_ಥ)  I could not update the ticket " + ticket);
+                    });
                 });
             } else {
                 reject(new Error("(⊙＿⊙')  Something went wrong. I didn't get version id."));
@@ -136,7 +138,7 @@ function updateFixVersions(config) {
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
     .then(result => { tickets = result; })
     .then(() => { return createNewVersionInJira(config.jira.url, auth64, versionConfig); })
-    .then(versionInfo => { return updateJiraTickets(tickets, versionInfo); })
+    .then(versionInfo => { return updateJiraTickets(tickets, versionInfo, config.jira.url, auth64); })
     .then(() => {
         console.log("(　＾∇＾)  Done.");
     })
