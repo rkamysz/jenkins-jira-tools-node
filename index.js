@@ -117,10 +117,9 @@ function getFormatedDate() {
     return [date[2],date[1],date[3]].join("/");
 }
 
+
 function updateFixVersions(config) {
-    console.log(`
-        (∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions in Jira tickets
-    `);
+    console.log(" (∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions in Jira tickets");
     var tickets = [];
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
     var versionConfig = { 
@@ -134,8 +133,8 @@ function updateFixVersions(config) {
 
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
     .then(result => { tickets = result; })
-    .then(createNewVersionInJira(config.jira.url, auth64, versionConfig))
-    .then(versionInfo => updateJiraTickets(tickets, versionInfo))
+    .then(() => { return createNewVersionInJira(config.jira.url, auth64, versionConfig); })
+    .then(versionInfo => { return updateJiraTickets(tickets, versionInfo); })
     .then(() => {
         console.log("(　＾∇＾)  Done.");
     })
