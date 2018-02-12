@@ -1,6 +1,13 @@
 const xml = require("xml-parse");
 const fetch = require("node-fetch");
 const fs = require('fs');
+const wizard = {
+    happy:"( •‿•)⊃━☆ﾟ.*･｡ﾟ  ",
+    crying:"( ಥ_ಥ)⊃━☆ﾟ.*･｡ﾟ  ",
+    ups:"('⊙＿⊙)⊃━☆ﾟ.*･｡ﾟ  ",
+    hurrah:"( ＾∇＾)⊃━☆ﾟ.*･｡ﾟ  ",
+    dont_you_mess_with_the_force:"(∩｀-´)⊃━☆ﾟ.*･｡*ﾟ☆☆ﾟ･｡ﾟ  "
+}
 
 function getChangeSetNode(nodes) {
     var node;
@@ -70,9 +77,9 @@ function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
         },
         body:'{"update":{"fixVersions":[{"add":{"id":"' + versionId + '"}}]}}'
     }).then(response => {
-        console.log("(•‿•)  Ticket " + ticket + " has been updated.");
+        console.log(wizard.happy + "Ticket " + ticket + " has been updated.");
     }).catch(error => {
-        console.log("(ಥ_ಥ)  Ticket " + ticket + " has not been updated. Error:", error);
+        console.log(wizard.crying + "Ticket " + ticket + " has not been updated. Error:", error);
     });
 }
 
@@ -85,28 +92,17 @@ function createNewVersionInJira(jiraUrl, auth64, data) {
         },
         body:JSON.stringify(data)
     }).then(response => {
-        console.log("(•‿•)  New version has been created " + data.name);
+        console.log(wizard.happy + "New version has been created " + data.name);
         return response.json();
     }).catch(error => {
-        console.log("(ಥ_ಥ)  Version " + data.name + " has not been added. Error:", error);
+        console.log(wizard.crying + "Version " + data.name + " has not been added. Error:", error);
     });
 }
 
 function updateJiraTickets(tickets, versionData, jiraUrl, auth64) {
-    return new Promise((resolve, reject) =>{
-        if(tickets.length == 0) {
-            console.log("(•‿•)  No tickets to update.");
-        } else {
-            console.log("(,••)-  We have "+ tickets.length + " ticket(s) to update");
-            if(versionData.id) {
-                return Promise.all(tickets.map((ticket) => {
-                    return updateTicketFixVersion(ticket, versionData.id, jiraUrl, auth64);
-                }));
-            } else {
-                reject(new Error("(⊙＿⊙')  Something went wrong. I didn't get version id."));
-            }
-        }
-    });
+    return Promise.all(tickets.map((ticket) => {
+        return updateTicketFixVersion(ticket, versionData.id, jiraUrl, auth64);
+    }));
 }
 
 function getFormatedDate() {
@@ -116,7 +112,7 @@ function getFormatedDate() {
 
 
 function updateFixVersions(config) {
-    console.log(" (∩｀-´)⊃━☆ﾟ.*･｡ﾟ Jenkins -> Jira Magic : update fixVersions in Jira tickets");
+    console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : update fixVersions in Jira tickets");
     var tickets = [];
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
     var versionConfig = { 
@@ -131,12 +127,26 @@ function updateFixVersions(config) {
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
     .then(result => { tickets = result; })
     .then(() => { return createNewVersionInJira(config.jira.url, auth64, versionConfig); })
-    .then(versionInfo => { return updateJiraTickets(tickets, versionInfo, config.jira.url, auth64); })
+    .then(versionInfo => { 
+        if(versionInfo.id) {
+            return versionInfo.id;
+        } else {
+            throw new Error(wizard.ups + "Something went wrong. I didn't get version id.")
+        }
+    })
+    .then(versionId => {
+        if(tickets.length == 0) {
+            console.log(wizard.happy + "No tickets to update.");
+        } else {
+            console.log(wizard.happy + "We have "+ tickets.length + " ticket(s) to update");
+            return updateJiraTickets(tickets, versionId, config.jira.url, auth64); 
+        } 
+    })
     .then(() => {
-        console.log("(　＾∇＾)  Done.");
+        console.log(wizard.hurrah + "Done.");
     })
     .catch(error => {
-        console.log("(⊙＿⊙')  Something went wrong. ", error);
+        console.log(wizard.ups + "Something went wrong. ", error);
     });
 }
 
