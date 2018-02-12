@@ -6,7 +6,7 @@ const wizard = {
     crying:"( ಥ_ಥ)⊃━☆ﾟ.*･｡ﾟ  ",
     ups:"('⊙＿⊙)⊃━☆ﾟ.*･｡ﾟ  ",
     hurrah:"( ＾∇＾)⊃━☆ﾟ.*･｡ﾟ  ",
-    dont_you_mess_with_the_force:"(∩｀-´)⊃━☆ﾟ.*･｡*ﾟ☆☆ﾟ･｡ﾟ  "
+    dont_you_mess_with_the_force:"(∩｀-´)⊃━☆ﾟ.*･｡ﾟ  "
 }
 
 function getChangeSetNode(nodes) {
@@ -77,7 +77,7 @@ function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
         },
         body:'{"update":{"fixVersions":[{"add":{"id":"' + versionId + '"}}]}}'
     }).then(response => {
-        console.log(wizard.happy + "Ticket " + ticket + " has been updated.");
+        console.log(wizard.happy + "Ticket " + ticket + " has been updated with new version " + versionId);
     }).catch(error => {
         console.log(wizard.crying + "Ticket " + ticket + " has not been updated. Error:", error);
     });
