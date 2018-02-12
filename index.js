@@ -62,7 +62,6 @@ function getVersionFromPackageJson() {
 }
 
 function updateTicketFixVersion(ticket, versionId, jiraUrl, auth64) {
-    console.log("Trying to update:", ticket);
     return fetch(jiraUrl + '/issue/' + ticket, { 
         method: 'PUT',
         headers: {
@@ -98,21 +97,15 @@ function updateJiraTickets(tickets, versionData, jiraUrl, auth64) {
         if(tickets.length == 0) {
             console.log("(•‿•)  No tickets to update.");
         } else {
-            console.log("We have "+ tickets.length + " ticket(s) to update");
+            console.log("(,••)-  We have "+ tickets.length + " ticket(s) to update");
             if(versionData.id) {
-                var promise = Promise.resolve();
-                tickets.forEach(ticket => {
-                    promise = promise.then(() => { return updateTicketFixVersion(ticket, 
-                        versionData.id, jiraUrl, auth64); })
-                    .catch(err => { 
-                        console.error("(ಥ_ಥ)  I could not update the ticket " + ticket);
-                    });
-                });
+                return Promise.all(tickets.map((ticket) => {
+                    return updateTicketFixVersion(ticket, versionData.id, jiraUrl, auth64);
+                }));
             } else {
                 reject(new Error("(⊙＿⊙')  Something went wrong. I didn't get version id."));
             }
         }
-        resolve();
     });
 }
 
