@@ -9,7 +9,7 @@ jjt.updateFixVersions({
         project:""
     },
     jenkins:{
-        buildXMLUrl:"<JENKINS URL>/job/asset-export-pipeline_Publish/lastBuild/api/xml"
+        buildXMLUrl:"<JENKINS URL>/job/<JOB_TITLE>/lastBuild/api/xml"
     },
     git:{
         ticketIdPattern:"(XXXX-[0-9]{0,})[\^d]*"
