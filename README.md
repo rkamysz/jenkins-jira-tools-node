@@ -1,4 +1,4 @@
-# Jenkins-JIra-Tools
+# Jenkins-Jira-Tools
 
 ## updateFixVersions
 
