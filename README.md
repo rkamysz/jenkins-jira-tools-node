@@ -36,7 +36,7 @@ The configuration object must be constructed in the following way:
         // This pattern will be used to get tickets ids from commits messages.
         // Mostly, ticket id is the combination of jira project name and index eg. WWW-1234
         // If it is in your case, then just replace XXXX with the proper name and it will work.
-        ticketIdPattern:"(XXXX-[0-9]{0,})[\^d]*"
+        ticketIdPattern:"(XXXX-[0-9]{0,})[(^\d)]*"
     },
     // These information will be used for creating a new version in Jira.
     versionData:{
@@ -80,6 +80,23 @@ jjt.updateFixVersions({
 ...
 sh "node updateJira.js"
 ...
+```
+## createNewVersionInJira
+
+### How to use it:
+```
+const jjt = require("jenkins-jira-tools");
+
+var auth64 = Buffer.from(JIRA_USER + ':' + JIRA_PASSWORD).toString('base64');
+
+jjt.createNewVersionInJira(JIRA_URL, auth64, 
+    name:"awesome_stuff@1.1.1",
+    project:"XXXX",
+    description:"Some awesome stuff",
+    archived:false,
+    released:true,
+    userReleaseDate:"26/Feb/2018"
+});
 ```
 
 If you do not use `node.js` you can check bash version of this tool:

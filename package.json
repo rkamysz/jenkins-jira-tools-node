@@ -1,6 +1,6 @@
 {
   "name": "jenkins-jira-tools",
-  "version": "1.1.24",
+  "version": "1.1.25",
   "description": "Some tools to automate processes between jenkins and jira.",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,6 @@
     "tools",
     "fixVersions",
     "node",
-    "java",
     "xml"
   ],
   "author": "Radoslaw Kamysz",

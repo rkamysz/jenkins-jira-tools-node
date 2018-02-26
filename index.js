@@ -21,7 +21,8 @@ function getChangeSetNode(nodes) {
 }
 
 function extractTicketFromCommit(commits, pattern) {
-    var reg = new RegExp(pattern);
+    var regex = new RegExp(pattern,'g');
+    var regexResult;
     var commit;
     var commitAttr;
     var tickets = [];
@@ -30,9 +31,9 @@ function extractTicketFromCommit(commits, pattern) {
         for(var j = 0; j < commit.childNodes.length; j++) {
             commitAttr = commit.childNodes[j];
             if(commitAttr.tagName === "comment") {
-                var ticketId = commitAttr.innerXML.match(reg);
-                if(ticketId[1]) {
-                    tickets.push(ticketId[1]);
+                regexResult = regex.exec(commitAttr.innerXML);
+                if(regexResult !== null) {
+                    tickets.push(regexResult[0]);
                 }
             }
         }
@@ -151,3 +152,4 @@ function updateFixVersions(config) {
 }
 
 module.exports.updateFixVersions = updateFixVersions;
+module.exports.createNewVersionInJira = createNewVersionInJira;
