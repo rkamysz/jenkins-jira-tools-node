@@ -150,6 +150,119 @@ function updateFixVersions(config) {
         console.log(wizard.ups + "Something went wrong. ", error);
     });
 }
+//WIP
+function changeStatus(config) {
+    console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : change status of the Jira tickets");
+    var tickets = [];
+    var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
+
+    getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
+    .then(result => { tickets = result; })
+    .then(() => { 
+        //get transitions and finf id by name
+        //for loop
+        return fetch(config.jira.url + '/issue/' + ticket + '/transitions', { 
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json',
+                'Authorization':'Basic ' + auth64
+            },
+            body:`{
+                "update": {
+                    "comment": [
+                        {
+                            "add": {
+                                "body": "${comment}"
+                            }
+                        }
+                    ]
+                },
+                "fields": {
+                    "assignee": {
+                        "name": "${assignee}"
+                    },
+                    "resolution": {
+                        "name": "${resolution}"
+                    }
+                },
+                "transition": {
+                    "id": "${transitionId}"
+                }
+            }`
+        }).then(response => {
+            console.log(wizard.happy + `Status of ${ticket} has been changed`);
+        }).catch(error => {
+            console.log(wizard.crying + `Status of ${ticket} has not been changed. Error:`, error);
+        });
+    })
+    .then(() => {
+        console.log(wizard.hurrah + "Done.");
+    })
+    .catch(error => {
+        console.log(wizard.ups + "Something went wrong. ", error);
+    });
+}
+//WIP
+function assignTo(config, username) {
+    console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : assign Jira ticket to the user");
+    var tickets = [];
+    var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
+
+    getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
+    .then(result => { tickets = result; })
+    .then(() => { 
+        return fetch(config.jira.url + '/issue/' + ticket, { 
+            method: 'PUT',
+            headers: {
+                'Content-Type':'application/json',
+                'Authorization':'Basic ' + auth64
+            },
+            body:'{"update":{"assignee":[{"set":{"name":"' + username + '"}}]}}'
+        }).then(response => {
+            console.log(wizard.happy + "Ticket " + ticket + " has been assigneed to " + username);
+        }).catch(error => {
+            console.log(wizard.crying + "Ticket " + ticket + " has not been assigned. Error:", error);
+        });
+    })
+    .then(() => {
+        console.log(wizard.hurrah + "Done.");
+    })
+    .catch(error => {
+        console.log(wizard.ups + "Something went wrong. ", error);
+    });
+}
+//WIP
+function addComment(config, comment) {
+    console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : add comment to the Jira ticket");
+    var tickets = [];
+    var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
+
+    getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
+    .then(result => { tickets = result; })
+    .then(() => { 
+        return fetch(config.jira.url + '/issue/' + ticket + '/comment', { 
+            method: 'PUT',
+            headers: {
+                'Content-Type':'application/json',
+                'Authorization':'Basic ' + auth64
+            },
+            body:'{"body":"' + comment + '"}'
+        }).then(response => {
+            console.log(wizard.happy + "Comment has been added to the ticket " + ticket);
+        }).catch(error => {
+            console.log(wizard.crying + "Coment has not been added to the ticket " + ticket + ". Error:", error);
+        });
+    })
+    .then(() => {
+        console.log(wizard.hurrah + "Done.");
+    })
+    .catch(error => {
+        console.log(wizard.ups + "Something went wrong. ", error);
+    });
+}
 
 module.exports.updateFixVersions = updateFixVersions;
 module.exports.createNewVersionInJira = createNewVersionInJira;
+module.exports.changeStatus = changeStatus;
+module.exports.assignTo = assignTo;
+module.exports.addComment = addComment;

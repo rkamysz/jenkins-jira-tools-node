@@ -1,6 +1,6 @@
 {
   "name": "jenkins-jira-tools",
-  "version": "1.1.25",
+  "version": "1.2.0",
   "description": "Some tools to automate processes between jenkins and jira.",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,9 @@
     "jenkins",
     "tools",
     "fixVersions",
+    "changeStatus",
+    "assignTo",
+    "addComment",
     "node",
     "xml"
   ],
