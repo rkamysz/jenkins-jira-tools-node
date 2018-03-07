@@ -42,6 +42,9 @@ function extractTicketFromCommit(commits, pattern) {
 }
 
 function getTicketsIds(url, pattern) {
+
+    return Promise.resolve(["HTML-3720"]);
+
     return fetch(url)
     .then(response => {
         return response.text();
@@ -111,7 +114,6 @@ function getFormatedDate() {
     return [date[2],date[1],date[3]].join("/");
 }
 
-
 function updateFixVersions(config) {
     console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : update fixVersions in Jira tickets");
     var tickets = [];
@@ -150,50 +152,92 @@ function updateFixVersions(config) {
         console.log(wizard.ups + "Something went wrong. ", error);
     });
 }
-//WIP
-function changeStatus(config) {
+
+
+function getAvailableTicketTransitions(jiraUrl, auth64, ticket) {
+    return fetch(jiraUrl + '/issue/' + ticket + '/transitions', { 
+        method: 'GET',
+        headers: {
+            'Content-Type':'application/json',
+            'Authorization':'Basic ' + auth64
+        }
+    }).then(response => {
+        return response.json();
+    }).catch(error => {
+        console.log(wizard.crying + "I couldn't get transitions. Error:", error);
+    });
+}
+
+function changeStatus(config, transitionData) {
     console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : change status of the Jira tickets");
     var tickets = [];
     var auth64 = Buffer.from(config.jira.user+':'+config.jira.password).toString('base64');
+    var transition = -1;
 
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
-    .then(result => { tickets = result; })
-    .then(() => { 
-        //get transitions and finf id by name
-        //for loop
-        return fetch(config.jira.url + '/issue/' + ticket + '/transitions', { 
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json',
-                'Authorization':'Basic ' + auth64
-            },
-            body:`{
-                "update": {
-                    "comment": [
-                        {
-                            "add": {
-                                "body": "${comment}"
-                            }
-                        }
-                    ]
-                },
-                "fields": {
-                    "assignee": {
-                        "name": "${assignee}"
-                    },
-                    "resolution": {
-                        "name": "${resolution}"
-                    }
-                },
-                "transition": {
-                    "id": "${transitionId}"
-                }
-            }`
-        }).then(response => {
-            console.log(wizard.happy + `Status of ${ticket} has been changed`);
-        }).catch(error => {
-            console.log(wizard.crying + `Status of ${ticket} has not been changed. Error:`, error);
+    .then(result => { 
+        tickets = result;
+        return getAvailableTicketTransitions(config.jira.url, auth64, tickets[0]);
+    })
+    .then(result => { 
+        transition = result.transitions.find(t => {
+            return t.name.toLowerCase() === transitionData.status.toLowerCase();
         });
+        if(transition === undefined) {
+            throw new Error(wizard.ups + "I couldn't find statusID for " + transitionData.status)
+        }
+
+        // need some request Body builder :)
+
+    })
+    .then(() => {
+
+        // {
+        //     "update": {
+        //         "comment": [
+        //             {
+        //                 "add": {
+        //                     "body": "${transitionData.comment}"
+        //                 }
+        //             }
+        //         ]
+        //     },
+        //     "fields": {
+        //         "assignee": {
+        //             "name": "${transitionData.assignee}"
+        //         },
+        //         "resolution": {
+        //             "name": "${transitionData.resolution}"
+        //         }
+        //     },
+        //     "transition": {
+        //         "id": "${transition.id}"
+        //     }
+        // }
+
+        return Promise.all(tickets.map((ticket) => {
+            return fetch(config.jira.url + '/issue/' + ticket + '/transitions', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Authorization':'Basic ' + auth64
+                },
+                body:`{
+                    "fields": {
+                        "resolution": {
+                            "name": "${transitionData.resolution}"
+                        }
+                    },
+                    "transition": {
+                        "id": "${transition.id}"
+                    }
+                }`
+            }).then(response => {
+                console.log(wizard.happy + `Status of ${ticket} has been changed`);
+            }).catch(error => {
+                console.log(wizard.crying + `Status of ${ticket} has not been changed. Error:`, error);
+            });
+        }));
     })
     .then(() => {
         console.log(wizard.hurrah + "Done.");
@@ -202,7 +246,7 @@ function changeStatus(config) {
         console.log(wizard.ups + "Something went wrong. ", error);
     });
 }
-//WIP
+
 function assignTo(config, username) {
     console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : assign Jira ticket to the user");
     var tickets = [];
@@ -210,19 +254,21 @@ function assignTo(config, username) {
 
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
     .then(result => { tickets = result; })
-    .then(() => { 
-        return fetch(config.jira.url + '/issue/' + ticket, { 
-            method: 'PUT',
-            headers: {
-                'Content-Type':'application/json',
-                'Authorization':'Basic ' + auth64
-            },
-            body:'{"update":{"assignee":[{"set":{"name":"' + username + '"}}]}}'
-        }).then(response => {
-            console.log(wizard.happy + "Ticket " + ticket + " has been assigneed to " + username);
-        }).catch(error => {
-            console.log(wizard.crying + "Ticket " + ticket + " has not been assigned. Error:", error);
-        });
+    .then(() => {
+        return Promise.all(tickets.map((ticket) => {
+            return fetch(config.jira.url + '/issue/' + ticket, { 
+                method: 'PUT',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Authorization':'Basic ' + auth64
+                },
+                body:'{"update":{"assignee":[{"set":{"name":"' + username + '"}}]}}'
+            }).then(response => {
+                console.log(wizard.happy + "Ticket " + ticket + " has been assigneed to " + username);
+            }).catch(error => {
+                console.log(wizard.crying + "Ticket " + ticket + " has not been assigned. Error:", error);
+            });
+        }));
     })
     .then(() => {
         console.log(wizard.hurrah + "Done.");
@@ -231,7 +277,7 @@ function assignTo(config, username) {
         console.log(wizard.ups + "Something went wrong. ", error);
     });
 }
-//WIP
+
 function addComment(config, comment) {
     console.log(wizard.dont_you_mess_with_the_force + "Jenkins -> Jira Magic : add comment to the Jira ticket");
     var tickets = [];
@@ -239,19 +285,21 @@ function addComment(config, comment) {
 
     getTicketsIds(config.jenkins.buildXMLUrl, config.git.ticketIdPattern)
     .then(result => { tickets = result; })
-    .then(() => { 
-        return fetch(config.jira.url + '/issue/' + ticket + '/comment', { 
-            method: 'PUT',
-            headers: {
-                'Content-Type':'application/json',
-                'Authorization':'Basic ' + auth64
-            },
-            body:'{"body":"' + comment + '"}'
-        }).then(response => {
-            console.log(wizard.happy + "Comment has been added to the ticket " + ticket);
-        }).catch(error => {
-            console.log(wizard.crying + "Coment has not been added to the ticket " + ticket + ". Error:", error);
-        });
+    .then(() => {
+        return Promise.all(tickets.map((ticket) => {
+            return fetch(config.jira.url + '/issue/' + ticket + '/comment', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json',
+                    'Authorization':'Basic ' + auth64
+                },
+                body:'{"body":"' + comment + '"}'
+            }).then(response => {
+                console.log(wizard.happy + "Comment has been added to the ticket " + ticket);
+            }).catch(error => {
+                console.log(wizard.crying + "Coment has not been added to the ticket " + ticket + ". Error:", error);
+            });
+        }));
     })
     .then(() => {
         console.log(wizard.hurrah + "Done.");
