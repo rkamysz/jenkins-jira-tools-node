@@ -1,24 +1,16 @@
 # Jenkins-Jira-Tools
 
-## updateFixVersions
+## Setup
+```
+npm install jenkins-jira-tools --save
+```
 
-This function updates "Fix version" field in all JIRA tickets, listed in build's changelog.
-
-### How it works:
-- First, it search tickets names to update - by filtering commits messages.
-- Secondly, it reads `package.json` file to get version name. If your project name contains separator "/" eg. some_organization/our_awesome_project, script will extract only the last part.
-- Thirdlly, it creates new version in Jira and parse response to get version id. 
-This version will be listed in JIRA's Releases page.
-- In the last, step it adds received version id in all found tickets.
-
-### Configuration:
-
-To make function work, you need config object and pass it to the function.
-The configuration object must be constructed in the following way:
+## Configuration:
 ```
 {
     jira:{
-        url:"",
+        // Jira API url
+        url:"https://<URL>/rest/api/latest",
         // user which has rights to create versions and moderate issues
         user:"",
         password:"",
@@ -31,31 +23,29 @@ The configuration object must be constructed in the following way:
         // Dunno if this path is dependent on the Jenkins version.
         // It should work if you fill <JENKINS_URL> and <JOB_TITLE>
         buildXMLUrl:"<JENKINS_URL>/job/<JOB_TITLE>/lastBuild/api/xml"
-    },
-    git:{
-        // This pattern will be used to get tickets ids from commits messages.
+        // This pattern will be used to get tickets ids from the commits.
         // Mostly, ticket id is the combination of jira project name and index eg. WWW-1234
         // If it is in your case, then just replace XXXX with the proper name and it will work.
         ticketIdPattern:"(XXXX-[0-9]{0,})[\^d]*"
     },
-    // These information will be used for creating a new version in Jira.
-    versionData:{
-        archived:false,
-        released:true,
-        description:""
-    }
 }
 ```
-### How to use it:
+## API
+### findTickets(output)
+### createVersion(data, output)
+### updateFixVersions(tickets, data)
+### changeStatus(tickets, data)
+### assignTo(tickets, username)
+### addComment(tickets, comment)
+
+## How to use it:
 
 Usage is very simple. You have to create some js file which you can call in jenkins pipeline step.
 In most cases, this step should be triggered only when releasing from master branch.
 
 #### JS (updateJira.js):
 ```
-const jjt = require("jenkins-jira-tools");
-
-jjt.updateFixVersions({
+const jjt = require("jenkins-jira-tools")({
     jira:{
         url:"",
         user:"",
@@ -63,17 +53,19 @@ jjt.updateFixVersions({
         project:""
     },
     jenkins:{
-        buildXMLUrl:"<JENKINS URL>/job/<JOB_TITLE>/lastBuild/api/xml"
-    },
-    git:{
+        buildXMLUrl:"<JENKINS URL>/job/<JOB_TITLE>/lastBuild/api/xml",
         ticketIdPattern:"(XXXX-[0-9]{0,})[\^d]*"
-    },
-    versionData:{
-        archived:false,
-        released:true,
-        description:""
     }
 });
+
+
+
+jjt.findTickets().updateFixVersions({
+    archived:false,
+    released:true,
+    description:"New is always better"
+}).unassign().addComment("It's alive").changeStatus("closed");
+
 ```
 #### JENKINS:
 ```
@@ -81,33 +73,3 @@ jjt.updateFixVersions({
 sh "node updateJira.js"
 ...
 ```
-## createNewVersionInJira
-
-### How to use it:
-```
-const jjt = require("jenkins-jira-tools");
-
-var auth64 = Buffer.from(JIRA_USER + ':' + JIRA_PASSWORD).toString('base64');
-
-jjt.createNewVersionInJira(JIRA_URL, auth64, 
-    name:"awesome_stuff@1.1.1",
-    project:"XXXX",
-    description:"Some awesome stuff",
-    archived:false,
-    released:true,
-    userReleaseDate:"26/Feb/2018"
-});
-```
-
-## changeStatus
-    WIP
-## assignTo
-    WIP
-## addComment
-    WIP
-
-
-Check also
-
-If you do not use `node.js` you can check bash version of this tool:
-https://github.com/rkamysz/jenkins-jira-tools

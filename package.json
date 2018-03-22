@@ -1,11 +1,8 @@
 {
   "name": "jenkins-jira-tools",
   "version": "1.2.0",
-  "description": "Some tools to automate processes between jenkins and jira.",
-  "main": "index.js",
-  "scripts": {
-    "test": "test"
-  },
+  "description": "Some tools to automate processes between jenkins, jira and gitlab.",
+  "main": "/bin/jjt.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/rkamysz/jenkins-jira-tools-node.git"
@@ -13,7 +10,10 @@
   "keywords": [
     "jira",
     "jenkins",
+    "gitlab",
+    "webhooks",
     "tools",
+    "createVersion",
     "fixVersions",
     "changeStatus",
     "assignTo",
@@ -28,7 +28,13 @@
   },
   "homepage": "https://github.com/rkamysz/jenkins-jira-tools-node#readme",
   "dependencies": {
+    "arkan.js": "^2.0.0",
     "node-fetch": "^1.7.3",
     "xml-parse": "^0.3.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.12",
+    "webpack-node-externals": "^1.6.0"
   }
 }
