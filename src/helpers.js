@@ -20,7 +20,7 @@ module.exports.buildTransitionsRequestBody = function(id, data) {
         transition:{ id: id }
     };
 
-    if(data.assignee) {
+    if(data.assignee !== undefined) {
         if(!body.fields) {
             body.fields = {};
         }
@@ -35,11 +35,12 @@ module.exports.buildTransitionsRequestBody = function(id, data) {
     }
     
     if(data.comment) {
-        body.update = {
-            comment:[{
-                add:{ body:data.comment }
-            }]
-        };
+        if(!body.update) {
+            body.update = {};
+        }
+        body.update.comment = [{
+            add:{ body:data.comment }
+        }];
     }
     return JSON.stringify(body);
 }

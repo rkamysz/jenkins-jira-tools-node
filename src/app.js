@@ -18,18 +18,29 @@ module.exports = function(config) {
             }));
         },
         changeStatus:function(tickets, data) {
+            var status,
+                transitionData = {};
+
+            if(typeof data === "string") {
+                status = data;
+            } else {
+                status = data.status;
+                Object.assign(transitionData, data);
+                console.log(transitionData)
+            }
+            
             return _jira.getAvailableTicketTransitions(tickets[0])
             .then(result => { 
                 transition = result.transitions.find(t => {
                     return t.name.toLowerCase() === status.toLowerCase();
                 });
                 if(transition === undefined) {
-                    throw new Error(wizard.ups + "I couldn't find status id for " + data.status)
+                    throw new Error(wizard.ups + "I couldn't find status id for " + status)
                 }
             })
             .then(() => {
                 return Promise.all(tickets.map((ticket) => {
-                    return _jira.changeTicketTransitions(ticket, transition.id, data);
+                    return _jira.changeTicketTransitions(ticket, transition.id, transitionData);
                 }));
             });
         },
