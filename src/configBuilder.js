@@ -40,9 +40,8 @@ module.exports = function() {
             return this;
         },
         build:function() {
-
             if (!jiraTicketIdPattern) {
-                jiraTicketIdPattern = `(${jiraProjectName}-[0-9]{0,})[^d]*`;
+                jiraTicketIdPattern = `(${jiraProjectName}-[0-9]{0,})[^d]{0}`;
             }
 
             if (!jenkinsBuildXMLUrl) {

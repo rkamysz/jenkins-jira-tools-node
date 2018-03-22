@@ -33,7 +33,11 @@ module.exports = function(config) {
                     console.log(wizard.happy + "New version has been created " + data.name);
                     return response.json();
                 }
-            }).catch(error => {
+            })
+            .then((version) => {
+                return version.id;
+            })
+            .catch(error => {
                 console.log(wizard.crying + "Version " + data.name + " has not been added.", error);
             });
         },

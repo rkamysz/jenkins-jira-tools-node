@@ -6,11 +6,11 @@ module.exports = function(config) {
     var _jenkins = require("./jenkins.js")(config.jenkins);
 
     return {
-        findTickets:function(output) {
-            return _jenkins.getTicketsIds().then(result => { output(result); });
+        findTickets:function() {
+            return _jenkins.getTicketsIds();//.then(result => { output(result); });
         },
-        createVersion:function(data, output){
-            return _jira.createVersion(data).then(result => { output(result); });
+        createVersion:function(data){
+            return _jira.createVersion(data);//.then(result => { output(result); });
         },
         updateFixVersions:function(tickets, versionId) {
             return Promise.all(tickets.map((ticket) => {

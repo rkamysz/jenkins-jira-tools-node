@@ -54,7 +54,7 @@ const jjt = require("jenkins-jira-tools")({
     },
     jenkins:{
         buildXMLUrl:"<JENKINS URL>/job/<JOB_TITLE>/lastBuild/api/xml",
-        ticketIdPattern:"(XXXX-[0-9]{0,})[\^d]*"
+        ticketIdPattern:"(XXXX-[0-9]{0,})[^d]{0}"
     }
 });
 
