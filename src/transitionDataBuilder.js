@@ -1,39 +1,42 @@
 module.exports = function() {
-    var archived = false,
-        released = true,
-        description = "",
-        project = "",
-        name = "";
+    var assignee,
+        comment,
+        status,
+        resolution;
 
     return {
-        setDescription:function(value) {
-            description = value;
+        setComment:function(value) {
+            comment = value;
             return this;
         },
-        setReleased:function(value) {
-            released = value;
+        setResolution:function(value) {
+            resolution = value;
             return this;
         },
-        setArchived:function(value) {
-            archived = value;
+        setStatus:function(value) {
+            status = value;
             return this;
         },
-        setProject:function(value) {
-            project = value;
-            return this;
-        },
-        setName:function(value) {
-            name = value;
+        setAssignee:function(value) {
+            assignee = value;
             return this;
         },
         build:function() {
-            return {
-                name:name,
-                project:project,
-                archived:archived,
-                released:released,
-                description:description
-            };
+            var result = {};
+            if(assignee) {
+                result.assignee = assignee;
+            }
+            if(comment) {
+                result.comment = comment;
+            }
+            if(status) {
+                result.status = status;
+            }
+            if(resolution) {
+                result.resolution = resolution;
+            }
+            
+            return result;
         }
     }
 };

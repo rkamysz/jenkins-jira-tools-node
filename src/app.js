@@ -7,10 +7,10 @@ module.exports = function(config) {
 
     return {
         findTickets:function() {
-            return _jenkins.getTicketsIds();//.then(result => { output(result); });
+            return _jenkins.getTicketsIds();
         },
         createVersion:function(data){
-            return _jira.createVersion(data);//.then(result => { output(result); });
+            return _jira.createVersion(data);
         },
         updateFixVersions:function(tickets, versionId) {
             return Promise.all(tickets.map((ticket) => {
@@ -26,7 +26,6 @@ module.exports = function(config) {
             } else {
                 status = data.status;
                 Object.assign(transitionData, data);
-                console.log(transitionData)
             }
             
             return _jira.getAvailableTicketTransitions(tickets[0])

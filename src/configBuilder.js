@@ -11,7 +11,7 @@ module.exports = function() {
         jenkinsBuildXMLUrl = "";
 
     return {
-        setJiraUrl:function(url) {
+        setJiraApiUrl:function(url) {
             jiraUrl = url;
             return this;
         },
