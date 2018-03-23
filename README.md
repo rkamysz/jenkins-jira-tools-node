@@ -20,53 +20,153 @@ const config = require("jenkins-jira-tools").configBuilder
 var jjt = new JJT(config);
 ```
 ### ConfigBuilder API
-#### setJiraUrl(url)
-#### setJiraUser(username, password)
-#### setJiraProjectName(name)
-#### [optional] setJiraTicketIdPattern(pattern)
+#### setJiraUrl
+##### Parameters
+Name | Type 
+--- | ---  
+url | string 
+
+#### setJiraUser
+##### Parameters
+Name | Type
+--- | ---  
+username | string
+password | string
+#### setJiraProjectName
+##### Parameters
+Name | Type 
+--- | ---  
+name | string
+#### [optional] setJiraTicketIdPattern
 With this method you set pattern to extract ticket numbers from commits.<br>
-Default value: `(${jiraProjectName}-[0-9]{0,})[^d]{0}`
-#### setJenkinsUrl(url)
-#### setJenkinsJobName(name)
-#### [optional] setJenkinsBuildXMLUrl(url)
+##### Parameters
+Name | Type | Default
+--- | --- | --- 
+pattern | string | `(${jiraProjectName}-[0-9]{0,})[^d]{0}`
+#### setJenkinsUrl
+##### Parameters
+Name | Type
+--- | ---  
+url | string 
+#### setJenkinsJobName
+##### Parameters
+Name | Type 
+--- | ---  
+name | string 
+#### [optional] setJenkinsBuildXMLUrl
 This method sets the url to the jenkins build XML file.<br>
-Default value: `${jenkinsUrl}/job/${jenkinsJobName}/lastBuild/api/xml`
-#### build()
+##### Parameters
+Name | Type | Default
+--- | --- | --- 
+url | string | `${jenkinsUrl}/job/${jenkinsJobName}/lastBuild/api/xml`
+
+#### build
 
 ## API
-### findTickets(output)
+### JJT API
+#### findTickets
 Get tickets numbers from the jenkins job change log. The data will be saved in the array, which should be given as an argument.
-### createVersion(data, setterFn)
+###### Parameters
+Name | Type 
+--- | ---  
+output | Array
+
+#### createVersion
 Create new version - based on given data - in Jira. Use `versionDataBuilder` to provide proper input data. As a second argument use function to save ___version id___ as a defined variable.<br>
+###### Parameters
+Name | Type
+--- | ---
+data | Object 
+setterFn | Function
+
 EXAMPLE BELOW
-### updateFixVersions(tickets, versionId)
+
+#### updateFixVersions
 Update ___Fix Version/s___ field in given tickets.
-### changeStatus(tickets, data)
+##### Parameters
+Name | Type
+--- | ---
+tickets | Array 
+versionId | String
+
+#### changeStatus
 Change ___Status___ of given tickets. As a `data` argument you can pass string value - status name - or use `transitionDataBuilder` to set more options.
 
 *MAKE SURE THAT: options you want to set are available in status edit window*
+
+##### Parameters
+Name | Type
+--- | ---
+tickets | Array 
+data | String/Object
+
 EXAMPLE BELOW
-### assignTo(tickets, username)
+
+#### assignTo
 Assign selected tickets to the user. If username is *not set* or `""`, than ticket will be *unassigned*
-### addComment(tickets, comment)
+##### Parameters
+Name | Type
+--- | ---
+tickets | Array 
+username | String
+#### addComment
 Add comment to tickets.
+##### Parameters
+Name | Type
+--- | ---
+tickets | Array 
+comment | String
 
 ### VersionDataBuilder API
-#### setDescription(value)
-#### setReleased(value)
-#### setArchived(value)
-#### [optional] setProject(value)
-Default value is taken from main config `jiraProjectName`
-#### [optional] setName(value)
-Default value is read from *package.json* file.
-#### build()
+#### setDescription
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### setReleased
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### setArchived
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### [optional] setProject
+##### Parameters
+Name | Type | Default
+--- | --- | ---
+value | String | Default value is taken from main config `jiraProjectName`
+#### [optional] setName
+##### Parameters
+Name | Type | Default
+--- | --- | ---
+value | String | Default value is read from *package.json* file.
+#### build
 
 ### TransitionDataBuilder API
-#### setComment(value)
-#### setResolution(value)
-#### setStatus(value)
-#### setAssignee(value)
-#### build()
+#### setComment
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### setResolution
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### setStatus
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### setAssignee
+##### Parameters
+Name | Type
+--- | ---
+value | String 
+#### build
 
 ## How to use it:
 
