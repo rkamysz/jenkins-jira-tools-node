@@ -19,154 +19,90 @@ const config = require("jenkins-jira-tools").configBuilder
 
 var jjt = new JJT(config);
 ```
-### ConfigBuilder API
-#### setJiraUrl
-##### Parameters
-Name | Type 
---- | ---  
-url | string 
-
-#### setJiraUser
-##### Parameters
-Name | Type
---- | ---  
-username | string
-password | string
-#### setJiraProjectName
-##### Parameters
-Name | Type 
---- | ---  
-name | string
-#### [optional] setJiraTicketIdPattern
-With this method you set pattern to extract ticket numbers from commits.<br>
-##### Parameters
-Name | Type | Default
---- | --- | --- 
-pattern | string | `(${jiraProjectName}-[0-9]{0,})[^d]{0}`
-#### setJenkinsUrl
-##### Parameters
-Name | Type
---- | ---  
-url | string 
-#### setJenkinsJobName
-##### Parameters
-Name | Type 
---- | ---  
-name | string 
-#### [optional] setJenkinsBuildXMLUrl
-This method sets the url to the jenkins build XML file.<br>
-##### Parameters
-Name | Type | Default
---- | --- | --- 
-url | string | `${jenkinsUrl}/job/${jenkinsJobName}/lastBuild/api/xml`
-
-#### build
 
 ## API
-### JJT API
-#### findTickets
+### **findTickets**
 Get tickets numbers from the jenkins job change log. The data will be saved in the array, which should be given as an argument.
-###### Parameters
+##### Parameters
 Name | Type 
 --- | ---  
 output | Array
-
-#### createVersion
+### **createVersion**
 Create new version - based on given data - in Jira. Use `versionDataBuilder` to provide proper input data. As a second argument use function to save ___version id___ as a defined variable.<br>
-###### Parameters
+##### Parameters
 Name | Type
 --- | ---
 data | Object 
 setterFn | Function
-
-EXAMPLE BELOW
-
-#### updateFixVersions
+### **updateFixVersions**
 Update ___Fix Version/s___ field in given tickets.
-##### Parameters
+#### Parameters
 Name | Type
 --- | ---
 tickets | Array 
 versionId | String
-
-#### changeStatus
+### **changeStatus**
 Change ___Status___ of given tickets. As a `data` argument you can pass string value - status name - or use `transitionDataBuilder` to set more options.
-
 *MAKE SURE THAT: options you want to set are available in status edit window*
-
-##### Parameters
+#### Parameters
 Name | Type
 --- | ---
 tickets | Array 
 data | String/Object
-
-EXAMPLE BELOW
-
-#### assignTo
+### **assignTo**
 Assign selected tickets to the user. If username is *not set* or `""`, than ticket will be *unassigned*
-##### Parameters
+#### Parameters
 Name | Type
 --- | ---
 tickets | Array 
 username | String
-#### addComment
+### **addComment**
 Add comment to tickets.
-##### Parameters
+#### Parameters
 Name | Type
 --- | ---
 tickets | Array 
 comment | String
+## Helpers
+### **ConfigBuilder**
+```
+const configBuilder = require("jenkins-jira-tools").configBuilder
+```
+#### setJiraUrl(url)
+#### setJiraUser(username, password)
+#### setJiraProjectName(name)
+#### [optional] setJiraTicketIdPattern(pattern)
+With this method you set pattern to extract ticket numbers from commits.<br>
+If it's not set than module uses `(${jiraProjectName}-[0-9]{0,})[^d]{0}`
+#### setJenkinsUrl(url)
+#### setJenkinsJobName(name)
+#### [optional] setJenkinsBuildXMLUrl(url)
+This method sets the url to the jenkins build XML file.<br>
+If it's not set than module uses `${jenkinsUrl}/job/${jenkinsJobName}/lastBuild/api/xml`
+#### build()
 
-### VersionDataBuilder API
-#### setDescription
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### setReleased
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### setArchived
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### [optional] setProject
-##### Parameters
-Name | Type | Default
---- | --- | ---
-value | String | Default value is taken from main config `jiraProjectName`
-#### [optional] setName
-##### Parameters
-Name | Type | Default
---- | --- | ---
-value | String | Default value is read from *package.json* file.
-#### build
+### **VersionDataBuilder**
+```
+const versionDataBuilder = require("jenkins-jira-tools").versionDataBuilder
+```
+#### setDescription(value)
+#### setReleased(value)
+#### setArchived(value)
+#### [optional] setProject(value)
+If it's not set than value is taken from main config `jiraProjectName`
+#### [optional] setName(value)
+If it's not set than value is read from *package.json* file.
+#### build()
 
-### TransitionDataBuilder API
-#### setComment
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### setResolution
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### setStatus
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### setAssignee
-##### Parameters
-Name | Type
---- | ---
-value | String 
-#### build
+### **TransitionDataBuilder**
+```
+const transitionDataBuilder = require("jenkins-jira-tools").transitionDataBuilder
+```
+#### setComment(value)
+#### setResolution(value)
+#### setStatus(value)
+#### setAssignee(value) 
+#### build()
 
 ## How to use it:
 
