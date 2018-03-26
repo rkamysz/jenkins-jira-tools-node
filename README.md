@@ -68,7 +68,7 @@ comment | String
 ```
 const configBuilder = require("jenkins-jira-tools").configBuilder
 ```
-#### setJiraUrl(url)
+#### setJiraApiUrl(url)
 #### setJiraUser(username, password)
 #### setJiraProjectName(name)
 #### [optional] setJiraTicketIdPattern(pattern)
