@@ -2,6 +2,7 @@ module.exports = function() {
     var assignee,
         comment,
         status,
+        statusId,
         resolution;
 
     return {
@@ -15,6 +16,10 @@ module.exports = function() {
         },
         setStatus:function(value) {
             status = value;
+            return this;
+        },
+        setStatusId:function(value) {
+            statusId = value;
             return this;
         },
         setAssignee:function(value) {
