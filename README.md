@@ -2,9 +2,6 @@
 
 Several tools that can speed up work by automating certain workflow processes. Jenkins -> Jira <- GitLab
 
-## TODO
-- Allow to change the status of various types of tickets
-
 ## Setup
 ```
 npm install jenkins-jira-tools --save
@@ -162,3 +159,7 @@ jjt.findTickets(tickets)
 sh "node updateJira.js"
 ...
 ```
+
+
+## Work in progress
+- Allow to change the status of various types of tickets
