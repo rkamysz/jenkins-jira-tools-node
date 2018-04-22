@@ -1,22 +1,92 @@
 const wizard = require("./wizard.js");
 
-module.exports = function(config) {
-    
-    var _jira = require("./jira.js")(config.jira);
-    var _jenkins = require("./jenkins.js")(config.jenkins);
+function App(config) {
+    let _jira = require("./jira.js")(config.jira);
+    let _jenkins = require("./jenkins.js")(config.jenkins);
+}
+
+App.prototype.findTickets = function() {
+    return _jenkins.getTicketsIds();
+}
+
+App.prototype.createVersion = function(data) {
+    return _jira.createVersion(data);
+}
+
+App.prototype.updateFixVersions = function(tickets, version) {
+    return Promise.all(tickets.map((ticket) => {
+        return _jira.changeTicketFixVersion(ticket, version);
+    }));
+}
+
+App.prototype.assignTo = function(tickets, username) {
+    return Promise.all(tickets.map((ticket) => {
+        return _jira.assignTicketTo(ticket,username);
+    }));
+}
+
+App.prototype.addComment = function(tickets, comment) {
+    return Promise.all(tickets.map((ticket) => {
+        return _jira.addCommentToTicket(ticket, comment);
+    }));
+}
+
+App.prototype.changeStatus = function(tickets, ...data) {
+    /*
+        data:
+            >check if data is string (A)|number (B)|object (C) (0)
+
+            - STRING eg. "closed" (A)
+            -------------------------
+                >find transition id by string
+                    |_ OK: (B)
+                        >build transition DO
+                        >iterate through tickets and apply transition change
+                            |_OK: log ok
+                            |_NO: log error
+                    |_ NO: ERROR
+
+            - NUMBER eg. 123456
+            -------------------
+                (B)
+            
+            - OBJECT { comment:"", resolution:"", status:"Closed", //1234 assignee:"" } || 
+                     { "Task":{ ... }, "Bug":{ ... }} ||
+                     { "Task":"Closed", "Bug":"Close" } ||
+                     { "Task":12345, "Bug":67890 } (C)
+            ---------------------------------------------------------------------------
+                >check if object contains "status" key
+                    |_YES: (3)
+                        >check if value is numeric
+                            |_YES: 
+                                (B)
+                            |_NO: 
+                                >isString
+                                    |_YES:
+                                        (A)
+                                    |_NO: ERROR
+                    |_NO:
+                        >find ticket types
+                        >iterate through tickets
+                            >grab ticket type
+                            >check if object contains type - key
+                                |_YES:
+                                    >check if data is string (A)|number (B)|object (C)
+                                    >build transition DO
+                                    >apply transition change
+                                |_NO:
+                                    >log error
+                            |_NO: 
+                                ERROR
+     */
+}
+
+module.exports = new App(config);
+
+function(config) {
 
     return {
-        findTickets:function() {
-            return _jenkins.getTicketsIds();
-        },
-        createVersion:function(data){
-            return _jira.createVersion(data);
-        },
-        updateFixVersions:function(tickets, versionId) {
-            return Promise.all(tickets.map((ticket) => {
-                return _jira.changeTicketFixVersion(ticket, versionId);
-            }));
-        },
+
         changeStatus:function(tickets, data) {
             var status,
                 transitionData = {};
@@ -79,16 +149,6 @@ module.exports = function(config) {
                     return _jira.changeTicketTransitions(ticket, transition.id, transitionData);
                 }));
             });
-        },
-        assignTo:function(tickets, username) {
-            return Promise.all(tickets.map((ticket) => {
-                return _jira.assignTicketTo(ticket,username);
-            }));
-        },
-        addComment:function(tickets, comment) {
-            return Promise.all(tickets.map((ticket) => {
-                return _jira.addCommentToTicket(ticket, comment);
-            }));
         }
     }
 }

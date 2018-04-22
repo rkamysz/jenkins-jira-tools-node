@@ -15,6 +15,10 @@ module.exports.getFormatedDate = function() {
     return [date[2],date[1],date[3]].join("/");
 }
 
+module.exports.isNumeric = function(value) {
+    return !isNaN(parseFloat(value)) && isFinite(value);
+}
+
 module.exports.buildTransitionsRequestBody = function(id, data) {
     var body = {
         transition:{ id: id }
