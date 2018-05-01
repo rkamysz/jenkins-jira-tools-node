@@ -32,6 +32,18 @@ App.prototype.addComment = function(tickets, comment) {
 }
 
 App.prototype.changeStatus = function(tickets, ...data) {
+    let strategies = {
+        "String" : StrategyA,
+        "Number" : StrategyB,
+        "Object" : StrategyC
+    };
+
+    try {
+        return strategies[input.constructor.name];
+    } catch(e) {
+        return StrategyDefault;
+    }
+}
     /*
         data:
             >check if data is string (A)|number (B)|object (C) (0)
@@ -79,7 +91,7 @@ App.prototype.changeStatus = function(tickets, ...data) {
                             |_NO: 
                                 ERROR
      */
-}
+//}
 
 module.exports = new App(config);
 

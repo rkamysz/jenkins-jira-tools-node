@@ -87,6 +87,21 @@ module.exports = function(config) {
                 console.log(wizard.crying + `Status of ${ticket} has not been changed.`, error);
             });
         },
+        getAllTicketsTypes: function() {
+            console.log(wizard.focused + "get all tickets types");
+            return fetch(_config.url + '/issuetype', { 
+                method: 'GET',
+                headers: _headers
+            }).then(response => {
+                if(response.status != 200) {
+                    throw new Error('status:' + response.status);
+                } else {
+                    console.log(wizard.happy + `Got all ticket types`);
+                }
+            }).catch(error => {
+                console.log(wizard.crying + `Ticket types not received.`, error);
+            });
+        },
         assignTicketTo: function(ticket, username) {
             console.log(wizard.focused + "assign Jira ticket to the user");
 
