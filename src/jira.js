@@ -97,9 +97,28 @@ module.exports = function(config) {
                     throw new Error('status:' + response.status);
                 } else {
                     console.log(wizard.happy + `Got all ticket types`);
+                    return response.json();
                 }
             }).catch(error => {
                 console.log(wizard.crying + `Ticket types not received.`, error);
+                return [];
+            });
+        },
+        getTicketType: function(ticket) {
+            console.log(wizard.focused + "get ticket type");
+            return fetch(_config.url + '/issuetype/' + ticket, { 
+                method: 'GET',
+                headers: _headers
+            }).then(response => {
+                if(response.status != 200) {
+                    throw new Error('status:' + response.status);
+                } else {
+                    console.log(wizard.happy + `Got all ticket types`);
+                    return response.json();
+                }
+            }).catch(error => {
+                console.log(wizard.crying + `Ticket types not received.`, error);
+                return {};
             });
         },
         assignTicketTo: function(ticket, username) {

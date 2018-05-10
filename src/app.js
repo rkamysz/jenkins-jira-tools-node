@@ -31,67 +31,9 @@ App.prototype.addComment = function(tickets, comment) {
     }));
 }
 
-App.prototype.changeStatus = function(tickets, ...data) {
-    let strategies = {
-        "String" : StrategyA,
-        "Number" : StrategyB,
-        "Object" : StrategyC
-    };
-
-    try {
-        return strategies[input.constructor.name];
-    } catch(e) {
-        return StrategyDefault;
-    }
+App.prototype.changeStatus = function(tickets, input) {
+    return getStatusChangeMethod(typeof input)(_jira, tickets, input);
 }
-    /*
-        data:
-            >check if data is string (A)|number (B)|object (C) (0)
-
-            - STRING eg. "closed" (A)
-            -------------------------
-                >find transition id by string
-                    |_ OK: (B)
-                        >build transition DO
-                        >iterate through tickets and apply transition change
-                            |_OK: log ok
-                            |_NO: log error
-                    |_ NO: ERROR
-
-            - NUMBER eg. 123456
-            -------------------
-                (B)
-            
-            - OBJECT { comment:"", resolution:"", status:"Closed", //1234 assignee:"" } || 
-                     { "Task":{ ... }, "Bug":{ ... }} ||
-                     { "Task":"Closed", "Bug":"Close" } ||
-                     { "Task":12345, "Bug":67890 } (C)
-            ---------------------------------------------------------------------------
-                >check if object contains "status" key
-                    |_YES: (3)
-                        >check if value is numeric
-                            |_YES: 
-                                (B)
-                            |_NO: 
-                                >isString
-                                    |_YES:
-                                        (A)
-                                    |_NO: ERROR
-                    |_NO:
-                        >find ticket types
-                        >iterate through tickets
-                            >grab ticket type
-                            >check if object contains type - key
-                                |_YES:
-                                    >check if data is string (A)|number (B)|object (C)
-                                    >build transition DO
-                                    >apply transition change
-                                |_NO:
-                                    >log error
-                            |_NO: 
-                                ERROR
-     */
-//}
 
 module.exports = new App(config);
 

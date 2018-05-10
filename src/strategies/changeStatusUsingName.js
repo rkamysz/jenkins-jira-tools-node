@@ -4,7 +4,7 @@ const findTransitionToStatus = function(transitions, statusName) {
     });
 }
 
-modules.export = function(jira, tickets, statusName){
+modules.export = function changeStatusUsingName(jira, tickets, statusName){
     return Promise.all(tickets.map((ticket) => {
         return jira.getAvailableTicketTransitions(ticket)
         .then((result) => findTransitionToStatus(result.transitions, statusName))
