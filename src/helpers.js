@@ -21,30 +21,24 @@ module.exports.isNumeric = function(value) {
 
 module.exports.buildTransitionsRequestBody = function(id, data) {
     var body = {
-        transition:{ id: id }
+        transition:{ id: id },
+        fields:{},
+        update:{}
     };
-
-    if(data.assignee !== undefined) {
-        if(!body.fields) {
-            body.fields = {};
+    if(data) {
+        if(data.assignee !== undefined) {
+            body.fields.assignee = { name:data.assignee };
         }
-        body.fields.assignee = { name:data.assignee };
-    }
-    
-    if(data.resolution) {
-        if(!body.fields) {
-            body.fields = {};
+        
+        if(data.resolution) {
+            body.fields.resolution = { name:data.resolution };
         }
-        body.fields.resolution = { name:data.resolution };
-    }
-    
-    if(data.comment) {
-        if(!body.update) {
-            body.update = {};
+        
+        if(data.comment) {
+            body.update.comment = [{
+                add:{ body:data.comment }
+            }];
         }
-        body.update.comment = [{
-            add:{ body:data.comment }
-        }];
     }
     return JSON.stringify(body);
 }

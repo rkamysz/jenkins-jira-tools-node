@@ -1,8 +1,8 @@
 module.exports = function getStatusChangeMethod(type) {
     let strategies = {
-        "string" : StrategyA,
-        "number" : StrategyB,
-        "object" : StrategyC
+        "string" : changeStatusUsingName,
+        "number" : changeStatusUsingId,
+        "object" : changeStatusUsingDataObject
     };
     return strategies[type] || StrategyDefault;
 }
