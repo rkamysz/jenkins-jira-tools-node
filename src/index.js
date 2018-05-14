@@ -1,6 +1,6 @@
 const Arkan = require('arkan.js').Arkan;
 const args = require('arkan.js').args;
-const isNumeric = require('helpers.js').isNumeric;
+const isNumeric = require('./helpers.js').isNumeric;
 
 const JJT = function (config) {
     _app = require("./app.js")(config);

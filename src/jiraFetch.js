@@ -1,44 +1,32 @@
 const fetch = require("node-fetch");
-const wizard = require("./wizard.js");
 
 const JiraFetch = function(user, password, url) {
     _jiraUrl = url;
     _auth64 = Buffer.from(`${user}:${password}`).toString('base64'),
     _headers = {
-        'Content-Type': 'application/json'/*,
-        'Authorization': `Basic ${_auth64}`*/
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${_auth64}`
     };
 
     _call = function(url, method, body, expectedStatus) {
-        console.log("WTF!");
         return fetch(_jiraUrl + url, {
             method: method,
             headers: _headers,
             body: body
         })
-        .then(response => onResult(response, expectedStatus))
-        .catch(error => error)
-        .then(result => {
-            if (result instanceof Error) {
-              throw result;
-            } else {
-              return result;
-            }
-          })
+        .then(response => onResult(response, expectedStatus));
     }
 };
 
 const onResult = function(response,expectedStatus) {
-    console.log("onResult",response);
-    if(expectedStatus && response.status != expectedStatus) { 
+    if(shouldThrowError(response,expectedStatus)) { 
         throw new Error(response.status);
     }
     return response.json();
 };
 
-const onError = function(error) {
-    console.log(wizard.crying, error);
-    throw new Error(error);
+const shouldThrowError = function(value, expectedStatus) {
+    return value instanceof Error || (expectedStatus && value.status != expectedStatus);
 };
 
 JiraFetch.prototype.post = function(url, body, expectedStatus) {
