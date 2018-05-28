@@ -1,8 +1,19 @@
-const chai = require('chai');
+var chai = require("chai");
+var sinonChai = require("sinon-chai");
+
+chai.use(sinonChai);
 const chaiFetchMock = require('chai-fetch-mock');
-const fetchMock = require('fetch-mock');
-const { shouldThrowError, buildHeaders, onResult, JiraFetch } = require('./../src/jiraFetch.js');
+//const fetchMock = require('fetch-mock');
+const fetch = require("node-fetch");
+const sinon = require("sinon");
+const JiraFetch = require('./../src/jiraFetch.js').JiraFetch;
+const { shouldThrowError, buildHeaders, onResult, fetchMethod } = require('./../src/jiraFetch.js').JiraFetchComponents;
 const expect = chai.expect;
+
+// const proxyquire = require('proxyquire');
+// const fakeFetch = proxyquire('./../src/jiraFetch.js', {
+//   'node-fetch': sinon.stub().returns(Promise.resolve())
+// });
 
 describe('JiraFetch', function () {
   describe('#onResult()', function () {
@@ -31,12 +42,11 @@ describe('JiraFetch', function () {
     });
   });
   describe('#post()', function() {
-    before(() => fetchMock.post('https://www.google.com/cats', { cats: 5 }))
-    it('to have been called', function() {
-      fetch.mockResponse("");
-      let jf = new JiraFetch("admin","admin","https://www.google.com");
-      jf.post("/cats","");
-      expect(jf).to.equal("");
+    it('fetch to have been called', function() {
+      let fakeFetch = sinon.stub(fetch, 'Promise').returns(Promise.resolve());
+      let JF = JiraFetch("admin","admin","https://www.google.de/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
+      JF.post("","");
+      expect(fakeFetch).to.have.been.called;
     });
   });
 });
